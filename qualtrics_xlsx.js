@@ -12,7 +12,7 @@ function readSingleFile(e) {
     }
     var reader = new FileReader();
     reader.onload = function(e) {
-        alert('loading a file');
+        // alert('loading a file');
         var contents = e.target.result;
         // displayContents(contents);
         readXLSX(contents);
@@ -57,6 +57,69 @@ function to_json(workbook) {
 function process_wb(wb) {
     var output_json = to_json(wb);
     var output = JSON.stringify(output_json, 2, 2);
+
+    var tableHTML = createTablesHTML(output_json);
+    var tables_html = document.getElementById('tables_html').textContent = tableHTML;
+
     displayContents(output);
-    if(typeof console !== 'undefined') console.log("output", new Date());
+    console.log(output_json);
+    // if(typeof console !== 'undefined') console.log("output", new Date());
+}
+
+function createTablesHTML(json) {
+
+    var attrs = json['Design Matrix 2'][0];
+
+    var option_set = new Set();
+    for (var a in attrs) {
+        if (attrs[a].indexOf('.') > -1) {
+            var option_id = attrs[a].split('.')[0];
+            option_set.add(option_id);
+        }
+    }
+
+    console.log('option_set');
+    console.log(option_set);
+
+    console.log('option_set[0]');
+    var option_list = Array.from(option_set);
+    console.log(option_list[0]);
+
+    var attr_strs = [];
+    for (var a in attrs) {
+        console.log(attrs[a], option_list[0] + '.');
+        if (attrs[a].startsWith(option_list[0] + '.')) {
+            attr_strs.push(attrs[a].replace(option_list[0] + '.', ''))
+        }
+    }
+
+    console.log('attr_strs');
+    console.log(attr_strs);
+
+    var tableHTML = "<span> Scenario 1 out of 5 </span>\n" +
+    "<font size=\"3\">\n" +
+    "<table border=\"4\" cellpadding=\"15\" cellspacing=\"0\" width=\"90%\">";
+
+
+    tableHTML += "<tr>\n<th><b><br></b></th>\n";
+    for (var option_idx in option_list) {
+        tableHTML += "<th>"+ option_list[option_idx] + "</th>\n";
+    }
+    tableHTML += "</tr>";
+
+    for (var attr_idx in attr_strs) {
+        tableHTML += "<tr>\n<td><b>" + attr_strs[attr_idx] + "</b></td>";
+
+        for (var op in option_list) {
+            tableHTML += "<td></td>\n";
+        }
+
+        tableHTML += "</tr>\n";
+    }
+
+
+    tableHTML += "  </tbody></table>\n" +
+        "</font>";
+
+    return tableHTML;
 }
