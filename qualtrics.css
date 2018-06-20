@@ -1,0 +1,10 @@
+
+#drop_dom_element {
+    height: 10em;
+    background-color: antiquewhite;
+    border: double black 4px;
+}
+
+.all_centre {
+    text-align: center;
+}
