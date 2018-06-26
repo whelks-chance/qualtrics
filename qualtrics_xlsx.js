@@ -59,7 +59,9 @@ function process_wb(wb) {
     var output = JSON.stringify(output_json, 2, 2);
 
     var tableHTML = createTablesHTML(output_json);
-    var tables_html = document.getElementById('tables_html').textContent = tableHTML;
+    document.getElementById('tables_html').textContent = tableHTML;
+
+    document.getElementById('table').innerHTML = tableHTML;
 
     displayContents(output);
     console.log(output_json);
@@ -86,32 +88,51 @@ function createTablesHTML(json) {
     console.log(option_list[0]);
 
     var attr_strs = [];
+    var attrs_with_selection_vars = {
+
+    };
+
+
     for (var a in attrs) {
         console.log(attrs[a], option_list[0] + '.');
         if (attrs[a].startsWith(option_list[0] + '.')) {
-            attr_strs.push(attrs[a].replace(option_list[0] + '.', ''))
+
+            var cleaned = attrs[a].replace(option_list[0] + '.', '');
+            attr_strs.push(cleaned);
+
+            // attrs_with_selection_vars['populated_attrs'].push(cleaned);
+
+            attrs_with_selection_vars[cleaned] = {};
+            for (var op in option_list) {
+                attrs_with_selection_vars[cleaned][option_list[op]] = ''
+            }
+
         }
     }
+
+    document.getElementById('options_json').textContent = JSON.stringify(attrs_with_selection_vars, 2, 2);
 
     console.log('attr_strs');
     console.log(attr_strs);
 
     var tableHTML = "<span> Scenario 1 out of 5 </span>\n" +
     "<font size=\"3\">\n" +
-    "<table border=\"4\" cellpadding=\"15\" cellspacing=\"0\" width=\"90%\">";
+    "<table class=\"table-sm table-bordered table-striped \">";
 
-
+    tableHTML += "<thead class=\"thead-light\">\n";
     tableHTML += "<tr>\n<th><b><br></b></th>\n";
     for (var option_idx in option_list) {
-        tableHTML += "<th>"+ option_list[option_idx] + "</th>\n";
+        tableHTML += "<th>Option "+ option_list[option_idx] + "</th>\n";
     }
     tableHTML += "</tr>";
+    tableHTML += "</thead>\n";
+
 
     for (var attr_idx in attr_strs) {
         tableHTML += "<tr>\n<td><b>" + attr_strs[attr_idx] + "</b></td>";
 
         for (var op in option_list) {
-            tableHTML += "<td></td>\n";
+            tableHTML += "<td>${e://Field/file." + attr_strs[attr_idx] + "." + option_list[op] + "}</td>\n";
         }
 
         tableHTML += "</tr>\n";
